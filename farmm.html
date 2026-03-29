@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bunga Farm Management System</title>
+    <style>
+        /* Reset and Base Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6; color: #333; background-color: #f8f9fa;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #1a6c2a, #b26f1f, #fdbb2d);
+            color: white; padding: 1rem 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .logo h1 { font-size:1.8rem; margin-bottom:0.25rem; }
+        .logo span { font-size:0.9rem; opacity:0.95; }
+
+        /* Nav */
+        nav ul { display:flex; list-style:none; flex-wrap:wrap; }
+        nav ul li { margin-left:1rem; }
+        nav ul li a {
+            color:#eef3f0; text-decoration:none; padding:0.5rem 1rem; border-radius:40px;
+            transition: all .3s ease; font-weight:500; cursor:pointer;
+        }
+        nav ul li a:hover, nav ul li a.active { background-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+        .logout-btn { background-color: rgba(220,53,69,0.8); border:1px solid rgba(255,255,255,0.3); }
+        .logout-btn:hover { background-color: rgba(220,53,69,1); }
+
+        /* Main Content */
+        main { padding:2rem 0; min-height: calc(100vh - 140px); }
+        .page-title { color:#1a6c2a; margin-bottom:2rem; padding-bottom:0.5rem; border-bottom:3px solid #fdbb2d; font-size:2.2rem; }
+
+        .page { display:none; }
+        .page.active { display:block; animation: fadeIn .4s ease; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+        /* Card */
+        .card { background:white; border-radius:20px; box-shadow:0 4px 6px rgba(0,0,0,0.08); padding:1.5rem; margin-bottom:1.5rem; border-left:4px solid #1a6c2a; }
+        .card h3 { color:#1a6c2a; margin-bottom:1rem; font-size:1.4rem; }
+
+        /* Forms */
+        .form-group { margin-bottom:1.25rem; }
+        label { display:block; margin-bottom:0.5rem; font-weight:600; color:#1a6c2a; }
+        input, select, textarea {
+            width:100%; padding:0.75rem; border:2px solid #e9ecef; border-radius:6px; font-size:1rem;
+        }
+        input:focus, select:focus, textarea:focus { outline:none; border-color:#1a6c2a; box-shadow:0 0 0 3px rgba(26,108,42,0.08); }
+
+        /* Buttons */
+        .btn { padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-size:1rem; font-weight:600; transition:all .3s; display:inline-block; text-align:center; }
+        .btn-primary { background: linear-gradient(135deg, #1a6c2a, #b26f1f); color:white; }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow: 0 4px 12px rgba(26,108,42,0.18); }
+        .btn-secondary { background:#6c757d; color:white; }
+        .btn-danger { background:#dc3545; color:white; }
+        .btn-success { background:#28a745; color:white; }
+        .btn-warning { background:#ffc107; color:#212529; }
+
+        /* Tables */
+        .table-container { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; margin-top:1rem; background:white; border-radius:8px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.08); }
+        th, td { padding:1rem; text-align:left; border-bottom:1px solid #e9ecef; }
+        th { background: linear-gradient(135deg, #1a6c2a, #b26f1f); color:white; font-weight:600; }
+        tr:hover { background-color:#f8f9fa; }
+
+        /* Dashboard grid */
+        .dashboard-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+        .stat-card { background:white; border-radius:10px; padding:1.5rem; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.08); border-top:4px solid #fdbb2d; transition:transform .25s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card h3 { font-size:2.5rem; color:#1a6c2a; margin-bottom:0.5rem; }
+        .stat-card p { color:#666; font-weight:600; }
+
+        /* Login Page */
+        .login-page { background: linear-gradient(135deg, #1a6c2a, #b26f1f, #fdbb2d); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+        .login-container { width:100%; max-width:480px; }
+        .login-header { text-align:center; color:white; margin-bottom:2rem; }
+        .login-header h1 { font-size:2.5rem; margin-bottom:0.5rem; text-shadow:2px 2px 4px rgba(0,0,0,0.25); }
+        .login-form-container { background:white; border-radius:15px; box-shadow:0 20px 40px rgba(0,0,0,0.08); padding:2.25rem; }
+
+        /* Tabs */
+        .tabs { display:flex; margin-bottom:1.5rem; border-bottom:2px solid #e9ecef; }
+        .tab { flex:1; padding:1rem; text-align:center; cursor:pointer; border-bottom:3px solid transparent; font-weight:600; color:#666; transition:all .3s; }
+        .tab.active { color:#1a6c2a; border-bottom-color:#1a6c2a; }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        /* Messages */
+        .error { background:#f8d7da; color:#721c24; padding:1rem; border-radius:6px; margin-bottom:1rem; border-left:4px solid #dc3545; }
+        .success { background:#d4edda; color:#155724; padding:1rem; border-radius:6px; margin-bottom:1rem; border-left:4px solid #28a745; }
+        .demo-credentials { background:#e7f3ff; border:1px solid #b3d9ff; border-radius:6px; padding:1rem; margin-top:1rem; text-align:center; }
+        footer { background-color:#1a6c2a; color:white; text-align:center; padding:1.25rem 0; margin-top:2rem; border-top:4px solid #fdbb2d; }
+
+        /* Responsive */
+        @media (max-width:768px) {
+            .header-content { flex-direction:column; text-align:center; }
+            nav ul { justify-content:center; }
+            .dashboard-grid { grid-template-columns:1fr; }
+            .page-title { font-size:1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Page -->
+    <div id="login-page" class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Bunga Farm Manager</h1>
+                <p>All-in-one Farm Management System</p>
+                <p><small>Manage workers, animals, crops & harvests</small></p>
+            </div>
+
+            <div class="login-form-container">
+                <div id="login-message"></div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('login')">Login</div>
+                    <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+                </div>
+
+                <div id="login-tab" class="tab-content active">
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" name="password" type="password" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+                    </form>
+                </div>
+
+                <div id="signup-tab" class="tab-content">
+                    <form id="signup-form" onsubmit="handleSignup(event)">
+                        <div class="form-group">
+                            <label for="fullname">Full Name</label>
+                            <input id="fullname" name="fullname" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="new_username">Username</label>
+                            <input id="new_username" name="new_username" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="new_password">Password</label>
+                            <input id="new_password" name="new_password" type="password" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input id="confirm_password" name="confirm_password" type="password" required/>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" style="display:none;">
+        <header>
+            <div class="container header-content">
+                <div class="logo">
+                    <h1>Bunga Farm Management</h1>
+                    <span id="welcome-message">Welcome, Farmer!</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a onclick="showPage('dashboard')" class="nav-link active">Dashboard</a></li>
+                        <li><a onclick="showPage('workers')" class="nav-link">Workers</a></li>
+                        <li><a onclick="showPage('animals')" class="nav-link">Animals</a></li>
+                        <li><a onclick="showPage('crops')" class="nav-link">Crops</a></li>
+                        <li><a onclick="showPage('activities')" class="nav-link">Activities</a></li>
+                        <li><a onclick="showPage('tasks')" class="nav-link">Tasks</a></li>
+                        <li><a onclick="showPage('harvests')" class="nav-link">Harvests</a></li>
+                        <li><a onclick="showPage('reports')" class="nav-link">Reports</a></li>
+                        <li><a onclick="logout()" class="logout-btn">Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Dashboard -->
+            <div id="dashboard-page" class="page active">
+                <h1 class="page-title">Farm Dashboard — Bunga Farm</h1>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card" onclick="showPage('workers')">
+                        <h3 id="stat-workers">0</h3>
+                        <p>Total Workers</p>
+                    </div>
+                    <div class="stat-card" onclick="showPage('animals')">
+                        <h3 id="stat-animals">0</h3>
+                        <p>Total Animals</p>
+                    </div>
+                    <div class="stat-card" onclick="showPage('crops')">
+                        <h3 id="stat-crops">0</h3>
+                        <p>Crop Fields</p>
+                    </div>
+                    <div class="stat-card" onclick="showPage('harvests')">
+                        <h3 id="stat-harvests">0</h3>
+                        <p>Recent Harvests</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Farm Activities</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Who</th>
+                                    <th>Activity</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activities-body">
+                                <!-- Activities will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:1rem;">
+                        <button onclick="showPage('workers')" class="btn btn-primary">Manage Workers</button>
+                        <button onclick="showPage('animals')" class="btn btn-primary">Manage Animals</button>
+                        <button onclick="showPage('crops')" class="btn btn-primary">Manage Crops</button>
+                        <button onclick="showPage('harvests')" class="btn btn-primary">Record Harvest</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workers Page -->
+            <div id="workers-page" class="page">
+                <h1 class="page-title">Workers Management</h1>
+                <div id="workers-message"></div>
+
+                <div class="card">
+                    <h3>Add New Worker</h3>
+                    <form id="add-worker-form" onsubmit="addWorker(event)">
+                        <div class="form-group">
+                            <label for="worker-name">Full Name</label>
+                            <input id="worker-name" name="worker_name" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="worker-role">Role</label>
+                            <select id="worker-role" name="worker_role" required>
+                                <option value="">Select Role</option>
+                                <option value="Farm Worker">Farm Worker</option>
+                                <option value="Veterinarian">Veterinarian</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Technician">Technician</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="worker-phone">Phone</label>
+                            <input id="worker-phone" name="worker_phone" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="worker-join-date">Join Date</label>
+                            <input id="worker-join-date" name="worker_join_date" type="date" required/>
+                        </div>
+                        <button class="btn btn-primary">Add Worker</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>All Workers</h3>
+                    <div class="table-container">
+                        <table id="workers-table">
+                            <thead>
+                                <tr><th>ID</th><th>Name</th><th>Role</th><th>Phone</th><th>Join Date</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animals Page -->
+            <div id="animals-page" class="page">
+                <h1 class="page-title">Animals Management</h1>
+                <div id="animals-message"></div>
+
+                <div class="card">
+                    <h3>Add New Animal</h3>
+                    <form id="add-animal-form" onsubmit="addAnimal(event)">
+                        <div class="form-group">
+                            <label for="animal-type">Type (e.g. Cow, Goat)</label>
+                            <input id="animal-type" name="animal_type" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-tag">Tag/ID</label>
+                            <input id="animal-tag" name="animal_tag" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-age">Age (years)</label>
+                            <input id="animal-age" name="animal_age" type="number" min="0" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="animal-status">Status</label>
+                            <select id="animal-status" name="animal_status" required>
+                                <option>Healthy</option>
+                                <option>Sick</option>
+                                <option>Pregnant</option>
+                                <option>Sold</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Add Animal</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>All Animals</h3>
+                    <div class="table-container">
+                        <table id="animals-table">
+                            <thead>
+                                <tr><th>ID</th><th>Type</th><th>Tag</th><th>Age</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crops Page -->
+            <div id="crops-page" class="page">
+                <h1 class="page-title">Crops Management</h1>
+                <div id="crops-message"></div>
+
+                <div class="card">
+                    <h3>Add New Crop Field</h3>
+                    <form id="add-crop-form" onsubmit="addCrop(event)">
+                        <div class="form-group">
+                            <label for="crop-name">Crop Name (e.g. Tomatoes)</label>
+                            <input id="crop-name" name="crop_name" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="crop-field">Field / Plot</label>
+                            <input id="crop-field" name="crop_field" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="crop-area">Area (acres)</label>
+                            <input id="crop-area" name="crop_area" type="number" step="0.1" min="0" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="crop-stage">Stage</label>
+                            <select id="crop-stage" name="crop_stage" required>
+                                <option>Planted</option>
+                                <option>Growing</option>
+                                <option>Mature</option>
+                                <option>Harvested</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Add Crop</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>All Crops / Fields</h3>
+                    <div class="table-container">
+                        <table id="crops-table">
+                            <thead>
+                                <tr><th>ID</th><th>Crop</th><th>Field</th><th>Area</th><th>Stage</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities Page -->
+            <div id="activities-page" class="page">
+                <h1 class="page-title">Activity Scheduler</h1>
+                <div id="activities-message"></div>
+
+                <div class="card">
+                    <h3>Schedule Activity</h3>
+                    <form id="add-activity-form" onsubmit="addActivity(event)">
+                        <div class="form-group">
+                            <label for="activity-title">Activity Title</label>
+                            <input id="activity-title" name="activity_title" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-responsible">Responsible Worker</label>
+                            <select id="activity-responsible" name="activity_responsible" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-schedule">Schedule</label>
+                            <input id="activity-schedule" name="activity_schedule" type="datetime-local" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-duration">Duration (hours)</label>
+                            <input id="activity-duration" name="activity_duration" type="number" min="1" required/>
+                        </div>
+                        <button class="btn btn-primary">Schedule Activity</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Planned Activities</h3>
+                    <div class="table-container">
+                        <table id="activities-table">
+                            <thead>
+                                <tr><th>ID</th><th>Title</th><th>Responsible</th><th>Schedule</th><th>Duration</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Page -->
+            <div id="tasks-page" class="page">
+                <h1 class="page-title">Task Assignments</h1>
+                <div id="tasks-message"></div>
+
+                <div class="card">
+                    <h3>Create New Task</h3>
+                    <form id="add-task-form" onsubmit="addTask(event)">
+                        <div class="form-group">
+                            <label for="task-worker">Assign To</label>
+                            <select id="task-worker" name="task_worker" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-desc">Task Description</label>
+                            <input id="task-desc" name="task_desc" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-due">Due Date</label>
+                            <input id="task-due" name="task_due" type="date" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-status">Status</label>
+                            <select id="task-status" name="task_status" required>
+                                <option>Pending</option>
+                                <option>In Progress</option>
+                                <option>Completed</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Create Task</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>All Tasks</h3>
+                    <div class="table-container">
+                        <table id="tasks-table">
+                            <thead>
+                                <tr><th>ID</th><th>Worker</th><th>Task</th><th>Due</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Harvests Page -->
+            <div id="harvests-page" class="page">
+                <h1 class="page-title">Harvest Records</h1>
+                <div id="harvests-message"></div>
+
+                <div class="card">
+                    <h3>Record New Harvest</h3>
+                    <form id="add-harvest-form" onsubmit="addHarvest(event)">
+                        <div class="form-group">
+                            <label for="harvest-crop">Crop</label>
+                            <select id="harvest-crop" name="harvest_crop" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="harvest-qty">Quantity (kg)</label>
+                            <input id="harvest-qty" name="harvest_qty" type="number" step="0.1" min="0" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="harvest-date">Date</label>
+                            <input id="harvest-date" name="harvest_date" type="date" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="harvest-notes">Notes</label>
+                            <textarea id="harvest-notes" name="harvest_notes" rows="2"></textarea>
+                        </div>
+                        <button class="btn btn-primary">Save Harvest</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Harvest History</h3>
+                    <div class="table-container">
+                        <table id="harvests-table">
+                            <thead>
+                                <tr><th>ID</th><th>Crop</th><th>Qty (kg)</th><th>Date</th><th>Notes</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports-page" class="page">
+                <h1 class="page-title">Reports & Analytics</h1>
+
+                <div class="card">
+                    <h3>Animal Health Summary</h3>
+                    <div class="table-container">
+                        <table id="animal-health-table">
+                            <thead><tr><th>Type</th><th>Total</th><th>Healthy</th><th>Sick</th></tr></thead>
+                            <tbody>
+                                <!-- Data will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Harvests</h3>
+                    <div class="table-container">
+                        <table id="report-harvests">
+                            <thead><tr><th>Crop</th><th>Date</th><th>Qty (kg)</th><th>Notes</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2025 Bunga Farm Management. Built by the Bunga Farm Team.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Data storage keys
+        const STORAGE_KEYS = {
+            USERS: 'bunga_farm_users',
+            WORKERS: 'bunga_farm_workers',
+            ANIMALS: 'bunga_farm_animals',
+            CROPS: 'bunga_farm_crops',
+            ACTIVITIES: 'bunga_farm_activities',
+            TASKS: 'bunga_farm_tasks',
+            HARVESTS: 'bunga_farm_harvests'
+        };
+
+        // Initialize default admin account if not exists
+        function initializeDefaultAdmin() {
+            const users = getFromStorage(STORAGE_KEYS.USERS) || {};
+            if (Object.keys(users).length === 0) {
+                users['admin'] = {
+                    password: 'admin123', // Default password - should be changed after first login
+                    fullname: 'Farm Administrator',
+                    email: 'admin@bungafarm.com'
+                };
+                saveToStorage(STORAGE_KEYS.USERS, users);
+            }
+            return users;
+        }
+
+        // Storage helper functions
+        function getFromStorage(key) {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : null;
+            } catch (e) {
+                console.error(`Error retrieving ${key} from storage:`, e);
+                return null;
+            }
+        }
+
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error(`Error saving ${key} to storage:`, e);
+                return false;
+            }
+        }
+
+        // Initialize data
+        let users = initializeDefaultAdmin();
+        let currentUser = null;
+
+        // Data arrays - loaded from localStorage
+        let workers = getFromStorage(STORAGE_KEYS.WORKERS) || [];
+        let animals = getFromStorage(STORAGE_KEYS.ANIMALS) || [];
+        let crops = getFromStorage(STORAGE_KEYS.CROPS) || [];
+        let activities = getFromStorage(STORAGE_KEYS.ACTIVITIES) || [];
+        let tasks = getFromStorage(STORAGE_KEYS.TASKS) || [];
+        let harvests = getFromStorage(STORAGE_KEYS.HARVESTS) || [];
+
+        // ------------------ Login / Signup / Tabs ------------------
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            // find clicked tab and activate (works if clicked)
+            event.target.classList.add('active');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('login-message', 'Please enter both username and password!', 'error');
+                return;
+            }
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                showMessage('login-message', `Welcome back, ${username}!`, 'success');
+                // show app
+                setTimeout(() => {
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    document.getElementById('welcome-message').textContent = `Welcome, ${username}!`;
+                    showPage('dashboard');
+                    refreshAllTables();
+                }, 700);
+            } else {
+                showMessage('login-message', 'Invalid username or password!', 'error');
+            }
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('new_username').value.trim();
+            const password = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            // Validation
+            if (!fullname || !email || !username || !password) {
+                showMessage('login-message', 'Please fill in all required fields!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('login-message', 'Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('login-message', 'Password must be at least 6 characters long!', 'error');
+                return;
+            }
+            
+            if (users[username]) {
+                showMessage('login-message', 'Username already exists!', 'error');
+                return;
+            }
+            
+            // Create new user
+            users[username] = {
+                password: password,
+                fullname: fullname,
+                email: email
+            };
+            
+            if (saveToStorage(STORAGE_KEYS.USERS, users)) {
+                showMessage('login-message', `Account created for ${fullname}. You can now login.`, 'success');
+                switchTab('login');
+                document.getElementById('signup-form').reset();
+            } else {
+                showMessage('login-message', 'Error creating account. Please try again.', 'error');
+            }
+        }
+
+        // ------------------ Page navigation ------------------
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+            const pageId = pageName + '-page';
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+
+            // activate nav link that includes pageName
+            for (let link of document.querySelectorAll('.nav-link')) {
+                if (link.textContent.trim().toLowerCase() === pageName.toLowerCase()) {
+                    link.classList.add('active');
+                    break;
+                }
+            }
+            // when showing certain pages populate select lists
+            if (pageName === 'activities') populateWorkerSelects();
+            if (pageName === 'tasks') populateWorkerSelects();
+            if (pageName === 'harvests') populateCropSelect();
+            if (pageName === 'reports') updateAnimalHealthReport();
+        }
+
+        // ------------------ Workers ------------------
+        function addWorker(e) {
+            e.preventDefault();
+            const form = new FormData(e.target);
+            const newWorker = {
+                id: 'W' + (workers.length + 1).toString().padStart(3,'0'),
+                name: form.get('worker_name'),
+                role: form.get('worker_role'),
+                phone: form.get('worker_phone'),
+                joinDate: form.get('worker_join_date')
+            };
+            workers.push(newWorker);
+            
+            if (saveToStorage(STORAGE_KEYS.WORKERS, workers)) {
+                showMessage('workers-message', `Worker ${newWorker.name} added.`, 'success');
+                updateWorkersTable();
+                e.target.reset();
+            } else {
+                showMessage('workers-message', 'Error saving worker. Please try again.', 'error');
+            }
+        }
+
+        function deleteWorker(id) {
+            if (!confirm('Delete this worker?')) return;
+            workers = workers.filter(w => w.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.WORKERS, workers)) {
+                showMessage('workers-message', 'Worker deleted.', 'success');
+                updateWorkersTable();
+            } else {
+                showMessage('workers-message', 'Error deleting worker. Please try again.', 'error');
+            }
+        }
+
+        function updateWorkersTable() {
+            const tbody = document.querySelector('#workers-table tbody');
+            tbody.innerHTML = '';
+            workers.forEach(w => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${w.id}</td>
+                    <td>${w.name}</td>
+                    <td>${w.role}</td>
+                    <td>${w.phone}</td>
+                    <td>${w.joinDate}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary" onclick="editWorker('${w.id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWorker('${w.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('stat-workers').textContent = workers.length;
+            populateWorkerSelects();
+        }
+
+        function editWorker(id) {
+            const wk = workers.find(x => x.id === id);
+            if (!wk) return alert('Worker not found');
+            // prefill add form for quick edit (simple approach)
+            document.getElementById('worker-name').value = wk.name;
+            document.getElementById('worker-role').value = wk.role;
+            document.getElementById('worker-phone').value = wk.phone;
+            document.getElementById('worker-join-date').value = wk.joinDate;
+            // remove old entry then user can Save to re-add (simple UX)
+            workers = workers.filter(w => w.id !== id);
+            saveToStorage(STORAGE_KEYS.WORKERS, workers);
+            updateWorkersTable();
+            showMessage('workers-message', `Editing ${wk.name}. Make changes and click Add Worker.`, 'success');
+        }
+
+        // ------------------ Animals ------------------
+        function addAnimal(e) {
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const a = {
+                id: 'A' + (animals.length + 1).toString().padStart(3,'0'),
+                type: f.get('animal_type'),
+                tag: f.get('animal_tag'),
+                age: Number(f.get('animal_age')),
+                status: f.get('animal_status')
+            };
+            animals.push(a);
+            
+            if (saveToStorage(STORAGE_KEYS.ANIMALS, animals)) {
+                showMessage('animals-message', `Animal ${a.tag} added.`, 'success');
+                updateAnimalsTable();
+                e.target.reset();
+            } else {
+                showMessage('animals-message', 'Error saving animal. Please try again.', 'error');
+            }
+        }
+
+        function deleteAnimal(id) {
+            if (!confirm('Delete this animal?')) return;
+            animals = animals.filter(a => a.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.ANIMALS, animals)) {
+                showMessage('animals-message', 'Animal removed.', 'success');
+                updateAnimalsTable();
+            } else {
+                showMessage('animals-message', 'Error deleting animal. Please try again.', 'error');
+            }
+        }
+
+        function updateAnimalsTable() {
+            const tbody = document.querySelector('#animals-table tbody');
+            tbody.innerHTML = '';
+            animals.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${a.id}</td>
+                    <td>${a.type}</td>
+                    <td>${a.tag}</td>
+                    <td>${a.age}</td>
+                    <td><span class="status-badge">${a.status}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary" onclick="editAnimal('${a.id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteAnimal('${a.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            const total = animals.length;
+            document.getElementById('stat-animals').textContent = total;
+        }
+
+        function editAnimal(id) {
+            const an = animals.find(x => x.id === id);
+            if (!an) return alert('Animal not found');
+            document.getElementById('animal-type').value = an.type;
+            document.getElementById('animal-tag').value = an.tag;
+            document.getElementById('animal-age').value = an.age;
+            document.getElementById('animal-status').value = an.status;
+            animals = animals.filter(a => a.id !== id);
+            saveToStorage(STORAGE_KEYS.ANIMALS, animals);
+            updateAnimalsTable();
+            showMessage('animals-message', `Editing ${an.tag}. Make changes and click Add Animal.`, 'success');
+        }
+
+        // ------------------ Crops ------------------
+        function addCrop(e) {
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const c = {
+                id: 'F' + (crops.length + 1).toString().padStart(3,'0'),
+                name: f.get('crop_name'),
+                field: f.get('crop_field'),
+                area: Number(f.get('crop_area')),
+                stage: f.get('crop_stage')
+            };
+            crops.push(c);
+            
+            if (saveToStorage(STORAGE_KEYS.CROPS, crops)) {
+                showMessage('crops-message', `Crop field ${c.field} added.`, 'success');
+                updateCropsTable();
+                e.target.reset();
+            } else {
+                showMessage('crops-message', 'Error saving crop. Please try again.', 'error');
+            }
+        }
+
+        function deleteCrop(id) {
+            if (!confirm('Delete this crop field?')) return;
+            crops = crops.filter(c => c.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.CROPS, crops)) {
+                showMessage('crops-message', 'Crop field removed.', 'success');
+                updateCropsTable();
+            } else {
+                showMessage('crops-message', 'Error deleting crop. Please try again.', 'error');
+            }
+        }
+
+        function updateCropsTable() {
+            const tbody = document.querySelector('#crops-table tbody');
+            tbody.innerHTML = '';
+            crops.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.id}</td>
+                    <td>${c.name}</td>
+                    <td>${c.field}</td>
+                    <td>${c.area} ac</td>
+                    <td>${c.stage}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary" onclick="editCrop('${c.id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteCrop('${c.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('stat-crops').textContent = crops.length;
+            populateCropSelect();
+        }
+
+        function editCrop(id) {
+            const cp = crops.find(x => x.id === id);
+            if (!cp) return alert('Crop not found');
+            document.getElementById('crop-name').value = cp.name;
+            document.getElementById('crop-field').value = cp.field;
+            document.getElementById('crop-area').value = cp.area;
+            document.getElementById('crop-stage').value = cp.stage;
+            crops = crops.filter(c => c.id !== id);
+            saveToStorage(STORAGE_KEYS.CROPS, crops);
+            updateCropsTable();
+            showMessage('crops-message', `Editing ${cp.field}. Make changes and click Add Crop.`, 'success');
+        }
+
+        // ------------------ Activities ------------------
+        function addActivity(e) {
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const act = {
+                id: 'ACT' + (activities.length + 1).toString().padStart(3,'0'),
+                title: f.get('activity_title'),
+                responsible: document.getElementById('activity-responsible').options[document.getElementById('activity-responsible').selectedIndex].text,
+                schedule: new Date(f.get('activity_schedule')).toLocaleString(),
+                duration: f.get('activity_duration') + ' hrs'
+            };
+            activities.push(act);
+            
+            if (saveToStorage(STORAGE_KEYS.ACTIVITIES, activities)) {
+                showMessage('activities-message', `Activity "${act.title}" scheduled.`, 'success');
+                updateActivitiesTable();
+                updateRecentActivities();
+                e.target.reset();
+            } else {
+                showMessage('activities-message', 'Error saving activity. Please try again.', 'error');
+            }
+        }
+
+        function deleteActivity(id) {
+            if (!confirm('Delete this activity?')) return;
+            activities = activities.filter(a => a.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.ACTIVITIES, activities)) {
+                showMessage('activities-message', 'Activity removed.', 'success');
+                updateActivitiesTable();
+                updateRecentActivities();
+            } else {
+                showMessage('activities-message', 'Error deleting activity. Please try again.', 'error');
+            }
+        }
+
+        function updateActivitiesTable() {
+            const tbody = document.querySelector('#activities-table tbody');
+            tbody.innerHTML = '';
+            activities.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${a.id}</td>
+                    <td>${a.title}</td>
+                    <td>${a.responsible}</td>
+                    <td>${a.schedule}</td>
+                    <td>${a.duration}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivity('${a.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateRecentActivities() {
+            const tbody = document.querySelector('#recent-activities-body');
+            tbody.innerHTML = '';
+            
+            // Get recent activities (last 5)
+            const recentActivities = activities.slice(-5).reverse();
+            
+            recentActivities.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${a.responsible}</td>
+                    <td>${a.title}</td>
+                    <td>${a.schedule}</td>
+                    <td><span class="status-badge status-confirmed">Scheduled</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ------------------ Tasks ------------------
+        function addTask(e) {
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const t = {
+                id: 'T' + (tasks.length + 1).toString().padStart(3,'0'),
+                worker: document.getElementById('task-worker').options[document.getElementById('task-worker').selectedIndex].text,
+                desc: f.get('task_desc'),
+                due: f.get('task_due'),
+                status: f.get('task_status')
+            };
+            tasks.push(t);
+            
+            if (saveToStorage(STORAGE_KEYS.TASKS, tasks)) {
+                showMessage('tasks-message', 'Task created.', 'success');
+                updateTasksTable();
+                e.target.reset();
+            } else {
+                showMessage('tasks-message', 'Error creating task. Please try again.', 'error');
+            }
+        }
+
+        function deleteTask(id) {
+            if (!confirm('Cancel this task?')) return;
+            tasks = tasks.filter(t => t.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.TASKS, tasks)) {
+                showMessage('tasks-message', 'Task removed.', 'success');
+                updateTasksTable();
+            } else {
+                showMessage('tasks-message', 'Error deleting task. Please try again.', 'error');
+            }
+        }
+
+        function updateTasksTable() {
+            const tbody = document.querySelector('#tasks-table tbody');
+            tbody.innerHTML = '';
+            tasks.forEach(t => {
+                const statusClass = t.status === 'Completed' ? 'status-confirmed' : (t.status === 'In Progress' ? 'status-pending' : '');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${t.id}</td>
+                    <td>${t.worker}</td>
+                    <td>${t.desc}</td>
+                    <td>${t.due}</td>
+                    <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteTask('${t.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ------------------ Harvests ------------------
+        function addHarvest(e) {
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const h = {
+                id: 'H' + (harvests.length + 1).toString().padStart(3,'0'),
+                crop: document.getElementById('harvest-crop').options[document.getElementById('harvest-crop').selectedIndex].text,
+                qty: Number(f.get('harvest_qty')),
+                date: f.get('harvest_date'),
+                notes: f.get('harvest_notes')
+            };
+            harvests.push(h);
+            
+            if (saveToStorage(STORAGE_KEYS.HARVESTS, harvests)) {
+                showMessage('harvests-message', `Harvest recorded: ${h.qty} kg of ${h.crop}.`, 'success');
+                updateHarvestsTable();
+                e.target.reset();
+            } else {
+                showMessage('harvests-message', 'Error saving harvest. Please try again.', 'error');
+            }
+        }
+
+        function deleteHarvest(id) {
+            if (!confirm('Delete this harvest?')) return;
+            harvests = harvests.filter(h => h.id !== id);
+            
+            if (saveToStorage(STORAGE_KEYS.HARVESTS, harvests)) {
+                showMessage('harvests-message', 'Harvest removed.', 'success');
+                updateHarvestsTable();
+            } else {
+                showMessage('harvests-message', 'Error deleting harvest. Please try again.', 'error');
+            }
+        }
+
+        function updateHarvestsTable() {
+            const tbody = document.querySelector('#harvests-table tbody');
+            tbody.innerHTML = '';
+            harvests.forEach(h => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${h.id}</td>
+                    <td>${h.crop}</td>
+                    <td>${h.qty}</td>
+                    <td>${h.date}</td>
+                    <td>${h.notes || ''}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-secondary">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteHarvest('${h.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('stat-harvests').textContent = harvests.length;
+            updateReportHarvests();
+        }
+
+        function updateReportHarvests() {
+            const tbody = document.querySelector('#report-harvests tbody');
+            tbody.innerHTML = '';
+            harvests.slice().reverse().forEach(h => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${h.crop}</td><td>${h.date}</td><td>${h.qty}</td><td>${h.notes || ''}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ------------------ Reports ------------------
+        function updateAnimalHealthReport() {
+            const tbody = document.querySelector('#animal-health-table tbody');
+            tbody.innerHTML = '';
+            
+            // Group animals by type and calculate health stats
+            const animalStats = {};
+            animals.forEach(animal => {
+                if (!animalStats[animal.type]) {
+                    animalStats[animal.type] = { total: 0, healthy: 0, sick: 0 };
+                }
+                animalStats[animal.type].total++;
+                if (animal.status === 'Healthy') {
+                    animalStats[animal.type].healthy++;
+                } else if (animal.status === 'Sick') {
+                    animalStats[animal.type].sick++;
+                }
+            });
+            
+            // Populate table
+            for (const [type, stats] of Object.entries(animalStats)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${type}</td>
+                    <td>${stats.total}</td>
+                    <td>${stats.healthy}</td>
+                    <td>${stats.sick}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        // ------------------ Helpers ------------------
+        function showMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => { container.innerHTML = ''; }, 5000);
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('login-form').reset();
+            showMessage('login-message', 'You have been logged out successfully!', 'success');
+        }
+
+        function populateWorkerSelects() {
+            const selects = [document.getElementById('activity-responsible'), document.getElementById('task-worker')];
+            selects.forEach(sel => {
+                if (!sel) return;
+                sel.innerHTML = '<option value="">Select Worker</option>';
+                workers.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w.id;
+                    opt.textContent = w.name;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+
+        function populateCropSelect() {
+            const sel = document.getElementById('harvest-crop');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Select Crop</option>';
+            crops.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} (${c.field})`;
+                sel.appendChild(opt);
+            });
+        }
+
+        function refreshAllTables() {
+            updateWorkersTable();
+            updateAnimalsTable();
+            updateCropsTable();
+            updateActivitiesTable();
+            updateTasksTable();
+            updateHarvestsTable();
+            updateRecentActivities();
+            populateWorkerSelects();
+            populateCropSelect();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshAllTables();
+            console.log('Bunga Farm Manager initialized');
+        });
+
+    </script>
+</body>
+</html>
